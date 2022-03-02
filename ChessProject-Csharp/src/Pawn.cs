@@ -8,7 +8,7 @@ namespace SolarWinds.MSP.Chess
         private int xCoordinate;
         private int yCoordinate;
         private PieceColor pieceColor;
-        
+
         public ChessBoard ChessBoard
         {
             get { return chessBoard; }
@@ -20,7 +20,7 @@ namespace SolarWinds.MSP.Chess
             get { return xCoordinate; }
             set { xCoordinate = value; }
         }
-        
+
         public int YCoordinate
         {
             get { return yCoordinate; }
@@ -38,10 +38,62 @@ namespace SolarWinds.MSP.Chess
             this.pieceColor = pieceColor;
         }
 
+        ///<summary>
+        ///Validates the requested move then updates the Pawns Location.
+        ///</summary>
         public void Move(MovementType movementType, int newX, int newY)
         {
-            throw new NotImplementedException("Need to implement Pawn.Move()");
+            if (ChessBoard.IsLegalBoardPosition(newX, newY) && ChessBoard.PositionEmpty(YCoordinate, XCoordinate))
+            {
+                switch (movementType)
+                {
+                    case MovementType.Move:
+                        if (LegalMove_(newX,newY))
+                        {
+                            XCoordinate = newX;
+                            YCoordinate = newY;
+                            Console.WriteLine(ToString());
+                        }
+                        break;
+                    case MovementType.Capture:
+                        throw new NotImplementedException("Movement Type not implemented!");
+                        break;
+                    default:
+                        throw new NotImplementedException("Incorrect Movement Type!");
+                        break;
+                }
+            }
         }
+
+        ///<summary>
+        ///Returns if the requested coordinates equates to a legal pawn move.
+        ///</summary>
+        private bool LegalMove_(int newX, int newY)
+        {
+            bool bLegal = false;
+            if (ChessBoard.IsLegalBoardPosition(newX, newY)
+                && ChessBoard.PositionEmpty(YCoordinate, XCoordinate)
+                && XCoordinate == newX)
+            {
+                int requestedDistance = YCoordinate - newY;
+                int allowedDistance = 1;
+                //Checks if this is the pawns first move.
+                if ((pieceColor == PieceColor.Black && XCoordinate == 6)
+                    || (pieceColor == PieceColor.White && XCoordinate == 1))
+                {
+                    allowedDistance = 2;
+                }
+
+                //Check if the requested movement is Legal taking into account the correct direction for the black and white pieces to move.
+                if ((pieceColor == PieceColor.Black && requestedDistance > 0 && requestedDistance <= allowedDistance)
+                    || (pieceColor == PieceColor.White && requestedDistance < 0 && requestedDistance >= (allowedDistance * -1)))
+                    bLegal = true;
+             }
+
+            return bLegal;
+        }
+
+        //Implement LegalCapture_() here.
 
         public override string ToString()
         {
